@@ -1,5 +1,5 @@
 /-!
-# Homework 5: Inhabitedness and Induction
+# Homework 5: Inhabitedness
 
 The PURPOSE of this homework is to greatly strengthen 
 your understanding of reasoning with sum and product
@@ -19,7 +19,7 @@ uses.
 
 /-!
 
-## PART 1: Inhabitedness and Logical Negation
+## PART 1
 
 Of particular importance in these questions is the
 idea that *having* a function value (implementation) 
@@ -55,29 +55,13 @@ no jam (there are no values of this type), or a proof
 that there is no cheese, and shows *in either case*
 that there can be no jam AND cheese. 
 -/
-
-/-!
-## New Addition: no (α : Type) := α → Empty
-
-We can make the logical intent of our
-types and computations clearer by introducing a
-shorthand, *no α* for the type *α → Empty*. Then
-in each place where a type like *α → Empty appears
-in this homework, replace it with *no α*. Use the
-right local names in each instance, of course. 
--/
 def no (α : Type) := α → Empty
 
-/-!
-We've now replaced each α → Empty with no α. We
-suggest that you go ahead and use *no* wherever
-doing so makes the logical meaning clearer. 
--/
 def not_either_not_both { jam cheese } :
   ((no jam) ⊕ (no cheese)) → 
   (no (jam × cheese)) 
-| Sum.inl nojam => (fun _ => _)
-| Sum.inr _ => _
+| Sum.inl nojam => (fun (j, _) => nojam j)
+| Sum.inr nocheese =>  (fun(_, c) => nocheese c)
 
 /-!
 ### #2: Not One or Not the Other Implies Not Both
@@ -91,8 +75,8 @@ names, *jam* and *cheese*.
 -/
 
 def demorgan1  {α β : Type} : ((α → Empty) ⊕ (β → Empty)) → (α × β → Empty)  
-| (Sum.inl noa) => _
-| (Sum.inr nob) => _
+| (Sum.inl noa) => fun(a, _) => noa a
+| (Sum.inr nob) => fun(_, b) => nob b
 
 /-!
 ### #3: Not Either Implies Not One And Not The Other
@@ -106,7 +90,7 @@ given *any* types, α and β,
 -/
 
 def demorgan2 {α β : Type} : (α ⊕ β → Empty) → ((α → Empty) × (β → Empty))
-| noaorb => _
+| noaorb => ((fun a => noaorb (Sum.inl a)), (fun b => noaorb (Sum.inr b)))
 
 
 /-!
@@ -119,7 +103,10 @@ Hint: You might want to use an explicit match expression
 in writing your solution.
 -/
 def demorgan3 {α β : Type} : ((α → Empty) × (β → Empty)) → ((α ⊕ β) → Empty)  
-| _ => _
+|(noa, nob) => fun 
+|Sum.inl a => noa a
+|Sum.inr b => nob b
+
 
 /-!
 ## PART 2
@@ -148,7 +135,9 @@ matching.
 -/
 
 -- Here
-
+def pred: Nat → Nat
+|Nat.zero => 0
+|(Nat.succ n') => n'
 
 
 -- Test cases
@@ -156,6 +145,8 @@ matching.
 #reduce pred 0    -- expect 0
 
 /-!
+
+
 ### #2. Big Doll from Smaller One n Times
 
 Write a function, *mk_doll : Nat → Doll*, that takes
@@ -165,7 +156,15 @@ returns the same doll as *d3*.
 -/
 
 -- Answer here
+inductive Doll : Type
+| solid
+| shell (d : Doll)
 
+open Doll
+
+def mk_doll: Nat → Doll
+|0 => solid
+|n + 1 => shell (mk_doll n)
 
 
 -- test cases
@@ -185,7 +184,7 @@ def nat_eq : Nat → Nat → Bool
 | 0, 0 => true
 | 0, n' + 1 => false
 | n' + 1, 0 => false
-| (n' + 1), (m' + 1) => _
+| (n' + 1), (m' + 1) => nat_eq n' m'
 
 -- a few tests
 #eval nat_eq 0 0
@@ -209,6 +208,15 @@ result *in each case*.
 -/
 
 -- Here
+def nat_le: Nat → Nat → Bool
+|0, _ => true
+|_, 0 => false
+|(n'+1), (m'+1) => nat_le n' m'
+
+#eval nat_le 0 0 --true
+#eval nat_le 2 1 --false
+#eval nat_le 1 2 --true
+
 
 /-!
 ###  #5. Nat Number Addition 
@@ -219,7 +227,7 @@ a natural number addition function.
 
 def add : Nat → Nat → Nat
 | m, 0 => m
-| m, (Nat.succ n') => _   -- hint: recursion
+| m, (Nat.succ n') => Nat.succ (add m n')   -- hint: recursion
 
 
 -- Some test cases
@@ -243,8 +251,14 @@ test cases to show that it appears to be working.
  -/
 
 def mul : Nat → Nat → Nat
-| m, 0 => m
-| m, (Nat.succ n') => add (_) (_)
+| m, 0 => 0
+| m, (Nat.succ n') => add m (mul m n') 
+
+
+#reduce mul 2 1   -- expect 2
+#reduce mul 3 3   -- expect 9
+#reduce mul 0 5   -- expect 0
+
 
 /-!
 ### Sum Binary Nat Function Over Range 0 to n 
@@ -262,7 +276,14 @@ to and including n.
 -/
 
 def sum_f : (Nat → Nat) → Nat → Nat 
-| f, 0 => _
-| f, n' + 1 => _
+| f, 0 => f 0
+| f, n' + 1 => add (f (n' + 1)) (sum_f f n')
+
+def square : Nat → Nat
+| n => n*n
+
+#reduce sum_f square 4 --expected 30
+#reduce sum_f square 3 --expected 14
+#reduce sum_f square 2 --expected 5
 
 
