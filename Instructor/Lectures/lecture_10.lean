@@ -301,13 +301,13 @@ def is_zero'' : Nat → Bool  -- this works but is verbose
 | Nat.zero => true
 | (Nat.succ n') => false 
 
-def is_zero' : Nat → Bool   -- (1 + n') is not a pattern
+def is_zero' : Nat → Bool   
 | 0 => true
-| (1 + n') => false           
+| (1 + n') => false         -- (1 + n') not a valid pattern     
 
 def is_Zero' : Nat → Bool   -- our preferred notation
 | 0 => true                 -- 0 for Nat.zero
-| n' + 1 => false           -- n' + 1 for (Nat.succ n')      
+| n' + 1 => false           -- n' + 1 is a valid pattern    
 
 /-!
 ### Exercises
@@ -318,6 +318,10 @@ Nat that is one smaller than n. We call it the *predecessor*
 of n, in contradistinction to the *successor* of n (n + 1).
 Hint: Look at how you wrote *inner* for the *Doll* type. 
 -/
+
+def pred : Nat → Nat 
+| 0 => 0
+| (Nat.succ n') => n'   -- destructures nat>0 to (succ n')
 
 -- Answer here
 
@@ -333,9 +337,10 @@ returns the same doll as *d3*.
 -/
 
 -- Answer here
+
 def mk_doll : Nat → Doll
-|0 => solid
-|n' +1 => shell
+| 0 => solid
+| n' + 1 => shell (mk_doll n')
 
 -- test cases
 #check mk_doll 3
@@ -349,24 +354,43 @@ many cases do you need to consider?
 -/
 def nat_eq : Nat → Nat → Bool
 | 0, 0 => true
-| 0, n' +1 => false
-| n'+ 1, 0 => false
-|(n' + 1), (m' + 1) => nat_eq 
+| 0, n' + 1 => false
+| n' + 1, 0 => false
+| (n' + 1), (m' + 1) => nat_eq n' m'
+
+#eval nat_eq 6 5
 
 /-!
-#3: Write a function, *nat_eq : Nat → Nat → Bool*, that
+#3: Write a function, *nat_le : Nat → Nat → Bool*, that
 takes any two natural numbers and that returns Boolean 
 *true* if the first value is less than or equal to the 
-second, and false otherwise. 
+second, and false otherwise. Hint: The key to solving
+this problem is to figure out the relevant cases, match 
+on them, and then return the right result *in each case*.
 -/
 
+-- Here
+
 /-!
-Write a function nat_add : Nat → Nat → Nat, that takes
-two Nat values and returns the Nat value representing
-their sum. Hint: Case analysis on the second argument.
+
+#4: Write a function nat_add : Nat → Nat → Nat, that 
+takes two Nat values and returns the Nat representing
+their sum. Method: You could do case analysis on either
+argument, but, to be consistent with Lean's definitions,
+do case analysis on the second (Nat) argument, returning
+the right result in either case. 
+
+The challenge is to rewrite the inductive case to one
+employing structural recursion. Remember, you assume
+you have (1) a successor constructor, *succ*, and (2)
+a recursive solution for the sum in the case where the 
+second argument to the recursive function application
+is structurally smaller than that argument to nat_add.  
  -/
 
-#check Nat.add
+def add : Nat → Nat → Nat
+| m, 0 => m
+| m, (Nat.succ n') => _
 
 /-!
 ## The List α Data Type
@@ -437,3 +461,4 @@ Exercise. Write a function polymorphic in one type,
 the result of appending the second list after the first.
 Hint: try case analysis on the first list argument.   
 -/
+
