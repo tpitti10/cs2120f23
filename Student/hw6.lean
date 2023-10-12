@@ -203,7 +203,7 @@ of all the natural numbers from *n* to *0*, inclusive.
 -- Your answer here
 def countdown : Nat → List Nat
 | 0 => [0]     
-| (n + 1) => (n+1) :: countdown n
+| (n + 1) => (n +1) :: countdown n
 
 
 -- test cases

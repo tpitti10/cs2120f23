@@ -24,6 +24,7 @@ inductive binary_op : Type
 | and
 | or
 | imp
+| iff
 
 inductive Expr : Type
 | var_exp (v : var)
@@ -51,6 +52,8 @@ def eval_un_op : unary_op → (Bool → Bool)
 def implies : Bool → Bool → Bool
 | true, false => false
 | _, _ => true
+
+def 
 
 def eval_bin_op : binary_op → (Bool → Bool → Bool)
 | binary_op.and => and

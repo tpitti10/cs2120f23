@@ -160,6 +160,8 @@ inductive binary_op : Type
 | and
 | or
 | imp
+| iff
+
 inductive Expr : Type
 | var_exp (v : var)
 | un_exp (op : unary_op) (e : Expr)
@@ -175,10 +177,18 @@ def eval_un_op : unary_op → (Bool → Bool)
 def implies : Bool → Bool → Bool
 | true, false => false
 | _, _ => true
+
+def biimplies : Bool → Bool → Bool
+| true, true => true
+| false, false => true
+|_, _ => false 
+
 def eval_bin_op : binary_op → (Bool → Bool → Bool)
 | binary_op.and => and
 | binary_op.or => or
 | binary_op.imp => implies
+| binary_op.iff => biimplies
+
 def Interp := var → Bool  
 def eval_expr : Expr → Interp → Bool 
 | (Expr.var_exp v),        i => i v
@@ -635,12 +645,20 @@ variables/columns, thus 8 rows, and thus a list of 8 output values.
 Let's give nicer names to three atomic propositions (i.e., variable
 expressions).
 -/
-def X := {v₀}
-def Y := {v₁}
-def Z := {v₂}
+def X := {v₀} -- mk.var(0)
+def Y := {v₁} -- mk.var(1)
+def Z := {v₂} -- mk.var(2)
 
 
-/-
+
+
+def A := {a} 
+def O := {o}
+def C := {c}
+def B := {b}
+
+
+/-!
 Now we can produce lists of outputs under all interpretations of variables
 from index 0 to the highest index of any variable appearing in the given
 expression. Confirm that the results are expected by writing out the
@@ -677,26 +695,39 @@ otherwise returns false. You can write helper functions if/as needed. Write
 short comments to explain what each of your functions does. Write a few test
 cases to demonstrate your results.
 -/
-variable (p q : Prop)
 
-def is_valid : Expr → Bool
-| e =>  _
+-- Here
+def list_and : List Bool → Bool
+| [] => true
+| (h::t) => and h (list_and t)
+
+
+def list_or : List Bool → Bool
+| [] => false
+| (h::t) => or h (list_or t)
+
 
 def is_sat : Expr → Bool
-| e =>  _
+|e => list_or (truth_table_outputs e)
 
 def is_unsat : Expr → Bool
-| e =>  _
+|e => not (is_sat e)
 
-def return : Expr → Bool
-| e 
+def is_valid : Expr → Bool
+|e => list_and (truth_table_outputs e)
+
+
+-- A few tests
+#eval is_valid (X)                      -- expect false
+#eval is_sat (X)                        -- exect true
+#eval is_sat (X ∧ ¬X)                   -- expect false
+#eval is_unsat (X ∧ ¬X)                 -- expect true
+#eval is_valid (X ∨ ¬X)                 -- expect true
+#eval is_valid ((¬(X ∧ Y) ⇒ (¬X ∨ ¬Y))) -- expect true
+#eval is_valid (¬(X ∨ Y) ⇒ (¬X ∧ ¬Y))   -- expect true
+#eval is_valid ((X ∨ Y) ⇒ (X ⇒ ¬Y))     -- expect false
 
 -- Test cases
-
-def e0 := p → q --satisfiable
-def e1 := p ∧ ¬p -- unsatisfiable
-def e2 := p ∨ ¬p --valid
-
 
 
 

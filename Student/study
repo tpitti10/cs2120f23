@@ -1,0 +1,8 @@
+def fact: Nat  Nat
+| 0 => 1
+| (n' +1 ) => (n'+1) *fact n'
+
+
+def list_len {a : Types} : List a to Nat
+| [] => 0
+|h::t => 1+ list_len t

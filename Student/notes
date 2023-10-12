@@ -1,0 +1,112 @@
+Generalization 
+
+Def id_poly : (α :Type) →α →α 
+| _,v =>v
+
+Def id_poly' (α :Type) :α →α 
+|v =>v
+(α : Type) binds the name α to the first (type) argument
+in this context, the rest of the function type is α → α
+the | gives the pattern matching rule for this function
+the names α and v bind to the first and the second arguments
+=> separates the pattern on the left from the return value on the right
+v, bound to the second argument, is the return value of this function
+the name α is unused after the => and so can be replaced by _
+Parametric polymorphism is one function definition that can take in multiple argument types
+
+
+
+Implicit Arguments 
+{alpha : Types} the curly braces allows you to call the function and not have to define the types you are using 
+
+def compose (α β γ : Type) (g : β → γ) (f : α → β) (x : α) : γ := g (f x)
+#eval compose Nat Nat Nat double triple 10 -- 60
+Nat Nat Nat can be replaced with _, _, _
+
+Instead…
+def compose {α β γ : Type} (g : β → γ) (f : α → β) (x : α) : γ := g (f x)
+#eval compose String.length appendWorld "hello" -- 10
+
+Inductive Types
+Like a constructor
+inductive NewType where 
+| constructor_1 : ... → NewType 
+| constructor_2 : ... → NewType 
+... 
+| constructor_n : ... → NewType
+
+The inductive keyword indicates that we're going to define the set of objects of a new type by giving rules for how those objects can be constructed.
+
+	Enumerated Types
+The simplest kind of inductive type is simply a type with a finite, enumerated list of elements.
+inductive Weekday where 
+| sunday : Weekday 
+| monday : Weekday 
+| tuesday : Weekday 
+| wednesday : Weekday 
+| thursday : Weekday 
+| friday : Weekday 
+| saturday : Weekday
+
+The days live in the Weekday namespace because when you call you need to do Weekday.[day]
+
+def natOfWeekday (d : Weekday) : Nat := 
+match d with 
+| Weekday.sunday => 1 
+| Weekday.monday => 2 
+| Weekday.tuesday => 3 
+| Weekday.wednesday => 4 
+| Weekday.thursday => 5 
+| Weekday.friday => 6 
+| Weekday.saturday => 7
+This is an example of pattern matching, each day is assigned a number
+
+Functions
+
+A Lean function has a name, can have parameters and take arguments, and has a body
+A lambda expression is an unnamed function, you define lambda expressions by using the fun keyword. Instead of using := use =>
+
+#eval List.map (fun x => x + 1) [1, 2, 3] -- [2, 3, 4]
+
+Empty Type
+The empty type is uninhabited
+No value creation for empty, no functions from inhabited type to Empty
+There is a function from Empty to Empty
+
+def empty_elim (α : Type) : Empty → α := nomatch e
+Logically speaking, one can say that from a contradiction (there is a value of type Empty), you can deduce anything at all.
+It's logically true: if I'm a cat (contradiction) then gerbils are really tiny neckless giraffes.
+
+Recursive Functions
+
+When writing you're writing the implementation of a recursive function, such as depth (shell d'), you can just assume that you already have the value of the answer for the next smaller argument. 
+
+Write a function, pred: Nat → Nat, that takes any Nat, n, and, if n is zero, returns zero, otherwise returns Nat that is one smaller than n. We call it the predecessor of n, in contradistinction to the successor of n (n + 1). 
+defpred :Nat →Nat 
+|0 =>0
+| (Nat.succ n') =>n'   -- destructures nat>0 to (succ n')
+
+Takes in n+1 and returns n
+
+
+-- test cases
+#reduce pred 3    -- expect 2
+#reduce pred 0    -- expect 0
+
+
+Propositional Logic
+
+Propositional logic is an example of a formal language with syntax and semantics
+The syntax specifies its set of well formed expressions, the semantics provides a way to assign meaning to each expression
+
+Atomic Propositions: a declarative statement that cannot be broken into smaller propositions and for which it makes sense to ask, is it true or not that …?
+	
+Should be written using single letter variables, to assign a meaning any possible expression will have to answer these questions:
+What does each variable mean?
+What do the connective symbols mean?
+How is the meaning of an expression computed from the meaning of its parts?
+
+Unsatisfiability is when the proposition can never be true (think r and not r)
+Valid is when the proposition can only be true (think r or not r)
+Satisfiability is when the proposition is true under at least one interpretation
+
