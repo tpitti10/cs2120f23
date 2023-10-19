@@ -17,7 +17,8 @@ given function, *f : α → β*, to each α in turn. E.g.,
 *map (λ (s : String) => s.length) ["Hello", "Lean"]* 
 returns *[5, 4]*.
 
-List.map takes a fu
+List.map takes a function as an argument and returns a list
+think List to List
 
 Here's the type of List.map in the Lean libraries.
 
@@ -45,7 +46,11 @@ to just one, indicating whether the list has at least one true
 value, is simply an n-ary extension of *or*. Applying such an
 n-ary operation on no arguments (an empty list) simply returns
 the identity element (base case value).  
+
+takes a binary operator inbetween head of the list and rest of the list computs the result
+
 -/
+
 
 
 #check @List.foldr 
@@ -77,6 +82,8 @@ def foldr (f : α → β → β) (init : β) : List α → β
 The *List.filter* function takes a list, *l* of α values, and an α → Bool 
 predicate function that indicates whether a given α value has a particular
 property, and returns the sublist of α values in l that have property, *p*.
+
+takes a unariy operator that must return a bool, applys the function to each element in the list and returns a new list
 -/
 
 #check @List.filter
