@@ -136,3 +136,43 @@ example : no Chaos := λ (c : Chaos) => nomatch c
 inductive Raining : Prop
 
 example : ¬Raining := λ (r : Raining) => nomatch r
+
+
+example : ¬False :=
+λ f => False.elim f
+
+
+-- to prove not p and not p
+
+--a prove of not p is a function that if given a proof of p gives you false
+--(P ∧ ¬P) → False (assume theres a proof of p and show that it implies q)
+
+example (P: Prop) : ¬(P ∧ ¬P) := λ (⟨p, np⟩) => np p
+
+example (P Q R : Prop) : (P→ Q) → (Q → R) → (P → R) :=
+fun pq qr => fun p => qr (pq p)
+
+example (α β γ : Type) : (α → β) → (β → γ) → (α → γ) :=
+fun ab bc => fun a => bc (ab a)
+
+example (P Q R : Prop) : P ∨ (Q ∧ R) → (P ∨ Q) ∧ (P ∨ R)
+| Or.inl p => ⟨Or.inl p, Or.inl p⟩
+| Or.inr ⟨ q, r⟩  => ⟨Or.inr q, Or.inr r⟩
+
+
+
+/-!
+law of the excluded middle: any prop is either true or not true
+-/
+
+
+axiom em : ∀ (P : Prop), P ∨ ¬P -- accept that this is true
+
+example : X ∨ ¬X := em X
+example (A B : Prop) : ¬(A ∧ B) -> ¬A ∨ ¬B
+| nab => Or.inl _ _
+
+
+example (A B : Prop) : ¬A ∨ ¬B → ¬(A ∧ B)
+| Or.inl na => fun ⟨a, b⟩ => na a
+| Or.inr nb => fun ⟨a, b⟩ => nb b
